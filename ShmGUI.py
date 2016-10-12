@@ -29,7 +29,7 @@ class App:
 
     def genplot(self):
         """Computes shm"""
-        self.values = np.arange(9)
+        self.values = np.arange(9, dtype=float)
 
         for i in range(9):
             self.values[i] = float(self.entries[i].get())
@@ -38,8 +38,13 @@ class App:
             self.shm.editshm(self.fields[1, i],self.values[i])
 
         self.shm.compshm()
-        self.shm.plotshm(yaxis=self.xvaeplot.get())
 
+        if self.xvaeplot.get() is not "e":
+            self.shm.plotshm(yaxis=self.xvaeplot.get())
+        else:
+            self.shm.compenergy()
+            self.shm.plotenergy()
+            
     def clearall(self):
         """Clears all the data entries"""
         for entry in self.entries:
