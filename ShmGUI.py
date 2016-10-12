@@ -27,7 +27,7 @@ class App:
 
         self.plotnames = np.array([["Displacement-time", "Velocity-time", "Acceleration-time", "Mechanical energy"],["x", "v", "a", "e"]])
 
-    def genplot(self, parameter):
+    def genplot(self):
         """Computes shm"""
         self.values = np.arange(9)
 
@@ -38,7 +38,7 @@ class App:
             self.shm.editshm(self.fields[1, i],self.values[i])
 
         self.shm.compshm()
-        self.shm.plotshm(yaxis=parameter)
+        self.shm.plotshm(yaxis=self.xvaeplot.get())
 
     def clearall(self):
         """Clears all the data entries"""
@@ -73,7 +73,8 @@ class App:
 
         self.clearall()
 
-        self.xvaeplot = "x"
+        self.xvaeplot = StringVar()
+        self.xvaeplot.set("x")
         self.plotselect = [0 for x in range(4)]
 
         for i in range(4):
@@ -82,7 +83,7 @@ class App:
             self.plotselect[i].pack()
 
         #Compute and plot button
-        self.compplot = Button(self.master, text="Compute and plot", command=lambda: self.genplot(self.xvaeplot))
+        self.compplot = Button(self.master, text="Compute and plot", command=lambda: self.genplot())
         self.compplot.pack(side=LEFT, padx=5, pady=5)
 
         #Clear entry button
