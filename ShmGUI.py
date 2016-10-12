@@ -73,6 +73,7 @@ class App:
 
         self.clearall()
 
+        #Radiobutton to select which plot to make
         self.xvaeplot = StringVar()
         self.xvaeplot.set("x")
         self.plotselect = [0 for x in range(4)]
