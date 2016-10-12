@@ -77,7 +77,7 @@ class Shm:
         elif parameter == "mass":
             self.mass = value
         elif parameter == "steps":
-            self.steps = value
+            self.steps = int(value)
         elif parameter == "time":
             self.time = value
         elif parameter == "b":
