@@ -31,8 +31,18 @@ class App:
         """Computes shm"""
         self.values = np.arange(9, dtype=float)
 
+        #Pops the error messages
         for i in range(9):
             self.values[i] = float(self.entries[i].get())
+
+            if self.values[i] < 0 and i is not (2 or 3 or 7):
+                messagebox.showerror("Error", "Entry value must be non-negative, except for initial position, "
+                                              "velocity and driving force.")
+                break;
+
+            if self.values[1] == 0 or self.values[4] == 0 or self.values[5] == 0:
+                messagebox.showerror("Error", "Mass, time duration and steps must be positive.")
+                break;
 
         for i in range(9):
             self.shm.editshm(self.fields[1, i],self.values[i])
