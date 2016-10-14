@@ -72,13 +72,22 @@ class Shm:
 
     def editshm(self, parameter, value):
         """Edits the value of parameters and the reconfigure the shm"""
+        if value < 0 and parameter is not ("F0" or "init_v" or "init_pos"):
+            raise ValueError("Entry value must be non-negative except for initial position, "
+                                              "velocity and driving force.")
         if parameter == "k":
             self.k = value
         elif parameter == "mass":
+            if value == 0:
+                raise ValueError("Mass must be greater than zero")
             self.mass = value
         elif parameter == "steps":
+            if value == 0:
+                raise ValueError("There must be at least one step")
             self.steps = int(value)
         elif parameter == "time":
+            if value == 0:
+                raise ValueError("Time duration is not specified")
             self.time = value
         elif parameter == "b":
             self.b = value
