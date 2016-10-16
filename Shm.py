@@ -72,10 +72,12 @@ class Shm:
 
     def editshm(self, parameter, value):
         """Edits the value of parameters and the reconfigure the shm"""
-        if value < 0 and parameter is not ("F0" or "init_v" or "init_pos"):
+        if value < 0 and (parameter != "F0") and (parameter != "init_v") and (parameter != "init_pos"):
             raise ValueError("Entry value must be non-negative except for initial position, "
-                                              "velocity and driving force.")
+                                              "velocity and driving force: %s" %(parameter))
         if parameter == "k":
+            if value == 0:
+                raise ValueError("Force constant must be greater than zero")
             self.k = value
         elif parameter == "mass":
             if value == 0:
