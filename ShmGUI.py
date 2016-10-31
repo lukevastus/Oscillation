@@ -1,6 +1,7 @@
 import numpy as np
 import Shm
 from tkinter import *
+from tkinter import messagebox
 
 
 class App:
@@ -27,11 +28,11 @@ class App:
 
         self.plotnames = np.array([["Displacement-time", "Velocity-time", "Acceleration-time", "Mechanical energy"],["x", "v", "a", "e"]])
 
-    def genplot(self):
-        """Computes shm"""
+    def genplot(self, threeD=0):
+        """Computes shm and generates corresponding plot"""
         self.values = np.arange(9, dtype=float)
 
-        #Pops the error messages
+        # Pops the error messages
         for i in range(9):
             self.values[i] = float(self.entries[i].get())
 
@@ -44,18 +45,21 @@ class App:
                 messagebox.showerror("Error", "Force constant, Mass, time duration and steps must be positive.")
                 break;
 
-        for i in range(9):
-            self.shm.editshm(self.fields[1, i],self.values[i])
+        for j in range(9):
+            self.shm.edit_shm(self.fields[1, j],self.values[j])
 
-        self.shm.compshm()
+        self.shm.comp_shm()
 
-        if self.xvaeplot.get() is not "e":
-            self.shm.plotshm(yaxis=self.xvaeplot.get())
+        if not threeD:
+            if self.xvaeplot.get() is not "e":
+                self.shm.plot_shm(yaxis=self.xvaeplot.get())
+            else:
+                self.shm.comp_energy()
+                self.shm.plot_energy()
         else:
-            self.shm.compenergy()
-            self.shm.plotenergy()
-            
-    def clearall(self):
+            self.shm.plot_3d()
+
+    def clear(self):
         """Clears all the data entries"""
         for entry in self.entries:
             entry.delete(0, END)
@@ -71,10 +75,10 @@ class App:
     def widgets(self):
         """Configures all the widgets"""
 
-        #Title
+        # Title
         self.master.title("Simple Harmonic Motion Simulator")
 
-        #Use iteration to create an array of buttons and labels
+        # Use iteration to create an array of entry buttons and labels
         self.entries = [0 for x in range(9)]
         self.values = np.zeros(9)
 
@@ -86,28 +90,32 @@ class App:
             self.entries[i] = Entry(self.frame1)
             self.entries[i].pack(side=RIGHT)
 
-        self.clearall()
+        self.clear()
 
-        #Radiobutton to select which plot to make
+        # Radiobutton to select which plot to make
         self.xvaeplot = StringVar()
         self.xvaeplot.set("x")
-        self.plotselect = [0 for x in range(4)]
+        self.plot_select = [0 for x in range(4)]
 
         for i in range(4):
-            self.plotselect[i] = Radiobutton(self.master, text=self.plotnames[0, i], variable=self.xvaeplot,
+            self.plot_select[i] = Radiobutton(self.master, text=self.plotnames[0, i], variable=self.xvaeplot,
                                              value=self.plotnames[1, i])
-            self.plotselect[i].pack()
+            self.plot_select[i].pack(anchor=W)
 
-        #Compute and plot button
-        self.compplot = Button(self.master, text="Compute and plot", command=lambda: self.genplot())
-        self.compplot.pack(side=LEFT, padx=5, pady=5)
+        # Compute and plot button
+        self.comp_plot = Button(self.master, text="Compute and plot", command=lambda: self.genplot())
+        self.comp_plot.pack(side=LEFT, padx=5, pady=5)
 
-        #Clear entry button
-        self.clearentry = Button(self.master, text="Clear all entries", command=lambda: self.clearall())
-        self.clearentry.pack(side=RIGHT, padx=5, pady=5)
+        # TEST: PLOT 3D GRAPH
+        self.threeD_plot = Button(self.master, text="3D plot", command=lambda: self.genplot(1))
+        self.threeD_plot.pack(side=LEFT, padx=5, pady=5)
+
+        # Clear entry button
+        self.clear_entry = Button(self.master, text="Clear all entries", command=lambda: self.clear())
+        self.clear_entry.pack(side=RIGHT, padx=5, pady=5)
 
 
-        #Clears the plot
-        #self.clearplot = Button(self.master, text="Clear plot", command=lambda: self.shm.clearplot())
-        #self.clearplot.pack(side=LEFT, padx=5, pady=5)
+        # Clears the plot
+        # self.clearplot = Button(self.master, text="Clear plot", command=lambda: self.shm.clearplot())
+        # self.clearplot.pack(side=LEFT, padx=5, pady=5)
 
