@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib
-#The following line is used to prevent matplotplib from crashing!
+# The following line is used to prevent matplotplib from crashing!
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import math
 
 
@@ -59,7 +60,7 @@ class Shm:
         self.t[0] = 0
         self.a[0] = 0
 
-    def compshm(self):
+    def comp_shm(self):
         """Computes the motion of the simple harmonic oscillator using the Euler-Cromer method"""
         self.step_size = self.time / self.steps
 
@@ -70,7 +71,7 @@ class Shm:
             self.a[i] = (self.v[i] - self.v[i - 1]) / self.step_size
             self.t[i] = self.t[i - 1] + self.step_size
 
-    def editshm(self, parameter, value):
+    def edit_shm(self, parameter, value):
         """Edits the value of parameters and the reconfigure the shm"""
         if value < 0 and (parameter != "F0") and (parameter != "init_v") and (parameter != "init_pos"):
             raise ValueError("Entry value must be non-negative except for initial position, "
@@ -105,57 +106,68 @@ class Shm:
             self.step_size = value
             self.time = self.step_size * self.steps
 
-    def plotshm(self, yaxis="x"):
+    def plot_shm(self, yaxis="x"):
         """Plots the graph of the simple harmonic oscillator,
         annoates max/min displacement and show the damping effect"""
         xvt = []
         xvtlabel = ""
         if yaxis == "x":
             xvt = self.x
-            xvtlabel = "Displacement ($m$)"
+            xvtlabel = "$\t{Displacement}(m)$"
 
         elif yaxis == "v":
             xvt = self.v
-            xvtlabel = "Velocity ($ms^{-1}$)"
+            xvtlabel = "$\t{Velocity}(ms^{-1})$"
 
         elif yaxis == "a":
             xvt = self.a
-            xvtlabel = "Acceleration ($ms^{-2}$)"
+            xvtlabel = "$\t{Acceleration}(ms^{-2})$"
 
         plt.plot(self.t, xvt)
-        plt.xlabel("Time ($s$)")
+        plt.xlabel("$\t{Time}(s)$")
         plt.ylabel(xvtlabel)
         plt.xlim(0, self.time)
         plt.ylim(min(xvt) * 2, max(xvt) * 2)
         plt.axhspan(min(xvt) * 0.001, max(xvt) * 0.001, color="black")
 
-        plt.annotate("Maximum " + xvtlabel + ": " + str("{0:.4g}".format(max(xvt))),
+        plt.annotate("$\t{Maximum}$ " + xvtlabel + ": " + str("{0:.4g}".format(max(xvt))),
                      xy=(self.step_size * np.argmax(xvt), max(xvt)),
                      xytext=(self.step_size * np.argmax(xvt) * 0.6, max(xvt) * 1.5),
                      arrowprops=dict(arrowstyle="-"))
 
-        plt.annotate("Minimum " + xvtlabel + ": " + str("{0:.4g}".format(min(xvt))),
+        plt.annotate("$\t{Minimum}$ " + xvtlabel + ": " + str("{0:.4g}".format(min(xvt))),
                      xy=(self.step_size * np.argmin(xvt), min(xvt)),
                      xytext=(self.step_size * np.argmin(xvt) * 0.6, min(xvt) * 1.5),
                      arrowprops=dict(arrowstyle="-"))
 
-        textstr = "Damping constant: %.2f ($kgs^{-1}$)\nDriving force: %.2f ($N$)\n" \
-                  "Driving frequency: %.2f ($rads^{-1}$)" % (self.b, self.F0, self.drive_freq)
+        textstr = "$\t{Damping\ constant}$: %.2f ($kgs^{-1}$)\n" \
+                  "$\t{Driving\ force}$: %.2f ($N$)\n" \
+                  "$\t{Driving\ frequency}$: %.2f ($rads^{-1}$)" %(self.b, self.F0, self.drive_freq)
 
-        props = dict(boxstyle='round', facecolor='white', alpha=0.5)
+        props = dict(boxstyle="round", facecolor="white", alpha=0.5)
 
         plt.text(self.time * 0.95, max(xvt) * 2 * 0.95, textstr, verticalalignment="top",
                  horizontalalignment="right", fontsize=12, bbox=props)
 
         plt.show()
 
-    def compenergy(self):
+    def plot_3d(self):
+        fig = plt.figure()
+        ax = fig.gca(projection="3d")
+        ax.plot(self.x, self.v, self.t, zdir="z", label="$\t{Displacement,\ velocity\ and\ time}$")
+        plt.xlabel("$\t{Displacement}(m)$")
+        plt.ylabel("$\t{Velocity}(ms^{-1})$")
+        ax.set_zlabel(zlabel="$\t{Time}(s)$")
+        ax.legend()
+        plt.show()
+
+    def comp_energy(self):
         """Computes the change in total, kinetic and potential energies"""
         self.ke = 0.5 * self.mass * (self.v ** 2)
         self.pe = 0.5 * self.k * (self.x ** 2)
         self.totale = self.ke + self.pe
 
-    def plotenergy(self):
+    def plot_energy(self):
         """Plots the change in total, kinetic and potential energies, with proper legends"""
         noenergy = self.time
 
@@ -164,26 +176,29 @@ class Shm:
                 noenergy = self.t[i]
                 break;
 
-        plt.plot(self.t, self.ke, color="#ffdab3", linewidth=2)
-        plt.plot(self.t, self.totale, color="black", linewidth=2, label="Total energy")
-        plt.fill_between(self.t, self.ke, self.totale, facecolor="#cce6ff", label="Potential energy")
-        plt.fill_between(self.t, 0, self.ke, facecolor="#ffdab3", label="Kinetic energy")
-        plt.xlabel("Time ($s$)")
-        plt.ylabel("Energy ($J$)")
+        # plt.plot(self.t, self.ke, color="#ffdab3", linewidth=2)
+        plt.stackplot(self.t, self.ke, self.pe, colors = ["#ffdab3", "#cce6ff"],
+                      labels = ["$\t{Kinetic\ energy}$", "$\t{Potential\ energy}$"])
+        # plt.plot(self.t, self.totale, color="black", linewidth=2, label="Total energy")
+        # plt.plot(self.t, self.totale, color="black", linewidth=2, label="Total energy")
+        # plt.fill_between(self.t, self.ke, self.totale, facecolor="#cce6ff", label="Potential energy")
+        # plt.fill_between(self.t, 0, self.ke, facecolor="#ffdab3", label="Kinetic energy")
+        plt.xlabel("$\t{Time}(s)$")
+        plt.ylabel("$\t{Energy}(J)$")
         plt.legend()
         plt.xlim(0, noenergy)
         plt.ylim(self.totale[0] * 0.01, max(self.totale) * 1.15)
 
         plt.show()
 
-    def clearplot(self):
+    def clear_plot(self):
         """Clears the entire coordinate plane"""
         plt.clf()
 
 
 
 
-#Wave class under construction as always LUL
+# Wave class under construction as always LUL
 """class wave:
 
     def __init__(self, v, wl, per):
@@ -199,6 +214,10 @@ class Shm:
         self.wl = self.per *
 
     def c"""
+
+
+
+
 
 
 
